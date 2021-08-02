@@ -25,25 +25,26 @@ class Conversations(APIView):
                 Conversation.objects.filter(Q(user1=user_id) | Q(user2=user_id))
                 .prefetch_related(
                     Prefetch(
-                        "messages", queryset=Message.objects.order_by("-createdAt")
+                        "messages", queryset=Message.objects.order_by("createdAt")
                     )
                 )
                 .all()
             )
 
             conversations_response = []
+            empty_message_convos = []
 
             for convo in conversations:
                 convo_dict = {
                     "id": convo.id,
                     "messages": [
                         message.to_dict(["id", "text", "senderId", "createdAt"])
-                        for message in reversed(convo.messages.all())
+                        for message in convo.messages.all()
                     ],
                 }
 
                 # set properties for notification count and latest message preview
-                convo_dict["latestMessageText"] = convo_dict["messages"][-1]["text"]
+                convo_dict["latestMessageText"] = convo_dict["messages"][-1]["text"] if convo_dict["messages"] else None
 
                 # set a property "otherUser" so that frontend will have easier access
                 user_fields = ["id", "username", "photoUrl"]
@@ -58,12 +59,16 @@ class Conversations(APIView):
                 else:
                     convo_dict["otherUser"]["online"] = False
 
-                conversations_response.append(convo_dict)
-
+                # add to empty_message_convos in case messages is empty
+                conversations_response.append(convo_dict) if convo_dict["messages"] else empty_message_convos.append(convo_dict)
+                    
             conversations_response.sort(
                 key=lambda convo: convo["messages"][-1]["createdAt"],
                 reverse=True,
             )
+            
+            # conversations with empty messages will show up at the end
+            conversations_response.extend(empty_message_convos)
 
             return JsonResponse(
                 conversations_response,
