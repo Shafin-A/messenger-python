@@ -117,3 +117,12 @@ export const searchUsers = (searchTerm) => async (dispatch) => {
     console.error(error);
   }
 };
+
+export const readMessages = (senderId) => async (dispatch) => {
+  try {
+    await axios.put("/api/messages/read", {senderId});
+    dispatch(fetchConversations());
+  } catch (error) {
+    console.error(error);
+  }
+};
