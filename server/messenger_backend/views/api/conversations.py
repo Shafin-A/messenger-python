@@ -59,6 +59,12 @@ class Conversations(APIView):
                 else:
                     convo_dict["otherUser"]["online"] = False
 
+                convo_dict["unreadCount"] = 0
+
+                for message in convo_dict["messages"]:
+                    if not message["read"] and message["senderId"] != user_id:
+                        convo_dict["unreadCount"] += 1
+
                 # add to empty_message_convos in case messages is empty
                 conversations_response.append(convo_dict) if convo_dict["messages"] else empty_message_convos.append(convo_dict)
                     
