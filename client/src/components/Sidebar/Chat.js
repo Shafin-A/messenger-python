@@ -52,7 +52,7 @@ const mapDispatchToProps = (dispatch) => {
 
       // check to see if there are messages before reading
       if (conversation.messages.length) {
-        dispatch(readMessages(conversation.otherUser.id, conversation.id));
+        dispatch(readMessages(conversation.id));
       }
     },
   };

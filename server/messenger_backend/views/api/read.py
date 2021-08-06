@@ -14,8 +14,10 @@ class Read(APIView):
                 return HttpResponse(status=401)
 
             body = request.data
-            sender_id = body.get("senderId")
             conversation_id = body.get("conversationId")
+
+            conversation = Conversation.objects.get(id=conversation_id)
+            sender_id = conversation.user1_id if user.id == conversation.user2_id else conversation.user2_id
 
             Message.objects.filter(senderId=sender_id).filter(conversation_id=conversation_id).filter(read=False).update(read=True)
 
