@@ -17,12 +17,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Messages = (props) => {
-  const { messages, otherUser, userId } = props;
+  const { messages, otherUser, lastReadMessage, userId } = props;
   const classes = useStyles();
-
-  const lastReadMessage = messages.filter((message) => 
-    message.senderId === userId && message.read
-  ).pop();
 
   return (
     <Box>
@@ -32,11 +28,11 @@ const Messages = (props) => {
         return message.senderId === userId ? (
           <div>
             <SenderBubble key={message.id} text={message.text} time={time} />
-            { message === lastReadMessage ? 
-            <div className={classes.avatarContainer}>
+            { message.id === lastReadMessage?.id && 
+            <Box className={classes.avatarContainer}>
               <Avatar alt={otherUser.username} src={otherUser.photoUrl} className={classes.avatar} />
-            </div>
-             : ''}
+            </Box> 
+            }
           </div>
         ) : (
           <OtherUserBubble key={message.id} text={message.text} time={time} otherUser={otherUser} />

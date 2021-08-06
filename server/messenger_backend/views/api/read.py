@@ -15,11 +15,11 @@ class Read(APIView):
 
             body = request.data
             sender_id = body.get("senderId")
+            conversation_id = body.get("conversationId")
 
-            Message.objects.filter(senderId=sender_id).filter(read=False).update(read=True)
+            Message.objects.filter(senderId=sender_id).filter(conversation_id=conversation_id).filter(read=False).update(read=True)
 
             return JsonResponse({"message": "Updated unread messages"})
         except Exception as e:
-            print(e)
             return HttpResponse(status=500)
 

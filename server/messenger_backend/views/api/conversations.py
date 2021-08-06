@@ -65,6 +65,10 @@ class Conversations(APIView):
                     if not message["read"] and message["senderId"] != user_id:
                         convo_dict["unreadCount"] += 1
 
+                read_messages = list(filter(lambda message: message["read"] and message["senderId"] == user_id, convo_dict["messages"]))
+
+                convo_dict["lastReadMessage"] = read_messages[-1] if read_messages else None
+                
                 # add to empty_message_convos in case messages is empty
                 conversations_response.append(convo_dict) if convo_dict["messages"] else empty_message_convos.append(convo_dict)
                     
