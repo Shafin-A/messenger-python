@@ -38,7 +38,7 @@ class Conversations(APIView):
                 convo_dict = {
                     "id": convo.id,
                     "messages": [
-                        message.to_dict(["id", "text", "senderId", "createdAt"])
+                        message.to_dict(["id", "text", "senderId", "createdAt", "read"])
                         for message in convo.messages.all()
                     ],
                 }
@@ -59,6 +59,16 @@ class Conversations(APIView):
                 else:
                     convo_dict["otherUser"]["online"] = False
 
+                convo_dict["unreadCount"] = 0
+
+                for message in convo_dict["messages"]:
+                    if not message["read"] and message["senderId"] != user_id:
+                        convo_dict["unreadCount"] += 1
+
+                read_messages = list(filter(lambda message: message["read"] and message["senderId"] == user_id, convo_dict["messages"]))
+
+                convo_dict["lastReadMessage"] = read_messages[-1] if read_messages else None
+                
                 # add to empty_message_convos in case messages is empty
                 conversations_response.append(convo_dict) if convo_dict["messages"] else empty_message_convos.append(convo_dict)
                     
