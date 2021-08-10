@@ -1,1 +1,1 @@
-online_users = []
+online_users = {}
