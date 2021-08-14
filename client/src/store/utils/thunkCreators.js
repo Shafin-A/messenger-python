@@ -62,6 +62,7 @@ export const logout = (id) => async (dispatch) => {
     await localStorage.removeItem("messenger-token");
     dispatch(gotUser({}));
     socket.emit("logout", id);
+    socket.close();
   } catch (error) {
     console.error(error);
   }
@@ -118,10 +119,12 @@ export const searchUsers = (searchTerm) => async (dispatch) => {
   }
 };
 
-export const readMessages = (conversationId) => async (dispatch) => {
+export const readMessages = (conversation) => async (dispatch) => {
   try {
+    const conversationId = conversation.id;
     await axios.put("/api/messages/read", {conversationId});
     dispatch(fetchConversations());
+    socket.emit("update-read", conversation.otherUser.id)
   } catch (error) {
     console.error(error);
   }
